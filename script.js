@@ -1,19 +1,37 @@
 document.addEventListener('DOMContentLoaded', function() {
-    var cartItems = document.querySelectorAll('#cart-items tbody tr');
-    var totalPrice = 0;
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    const cartItemsList = document.getElementById('cart-items');
+    const cartCount = document.getElementById('cart-count');
+    const cartTotal = document.getElementById('cart-total');
 
-    cartItems.forEach(function(item) {
-        var price = parseFloat(item.querySelector('td:nth-child(2)').textContent.replace('$', ''));
-        totalPrice += price;
+    let cartItems = [];
+    let total = 0;
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const price = parseFloat(button.getAttribute('data-price'));
+            total += price;
+            cartItems.push({ name: button.previousElementSibling.textContent, price });
+            updateCart();
+        });
     });
 
-    document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+    function updateCart() {
+        cartItemsList.innerHTML = '';
+        cartItems.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.name} - $${item.price}`;
+            cartItemsList.appendChild(li);
+        });
+        cartCount.textContent = cartItems.length;
+        cartTotal.textContent = total.toFixed(2);
+    }
 
-    var confirmOrderBtn = document.getElementById('confirm-order-btn');
-    var orderConfirmation = document.getElementById('order-confirmation');
-
-    confirmOrderBtn.addEventListener('click', function() {
-        orderConfirmation.textContent = 'Your order has been confirmed and will be delivered soon.';
-        orderConfirmation.style.color = 'green';
+    const checkoutBtn = document.getElementById('checkout-btn');
+    checkoutBtn.addEventListener('click', function() {
+        alert(`Total: $${total.toFixed(2)}\nThank you for shopping with us!`);
+        cartItems = [];
+        total = 0;
+        updateCart();
     });
 });
